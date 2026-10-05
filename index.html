@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SAPPHIRE - Computer • Printer • CCTV Invoice Generator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sapphire: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                            800: '#1e3a8a',
+                            900: '#0f172a',
+                            dark: '#03122e',
+                            accent: '#0052cc',
+                            bright: '#00d2ff'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        brand: ['"Orbitron"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base styles */
+        body {
+            background-color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .bg-sapphire-gradient {
+            background: linear-gradient(135deg, #03122e 0%, #082862 50%, #0048aa 100%);
+        }
+
+        /* Prevent auto-zoom on mobile input focus */
+        @media (max-width: 768px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+
+        /* PRINT STYLESHEET FOR A4 INVOICE */
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            #printable-invoice, #printable-invoice * {
+                visibility: visible !important;
+            }
+            #printable-invoice {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 15mm !important;
+                box-shadow: none !important;
+                background: white !important;
+            }
+            .no-print, header, nav, footer, #mobile-bottom-nav {
+                display: none !important;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col pb-20 md:pb-6">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="bg-sapphire-gradient text-white shadow-lg border-b border-sapphire-600/30 sticky top-0 z-30 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
+            
+            <!-- Logo & Brand Header -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('history')">
+                <div class="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 flex items-center justify-center bg-white rounded-full p-1 shadow-md border-2 border-cyan-400">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                        <defs>
+                            <linearGradient id="sapphireGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#00d2ff" />
+                                <stop offset="50%" stop-color="#0052cc" />
+                                <stop offset="100%" stop-color="#03122e" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="48" fill="none" stroke="#0048aa" stroke-width="2"/>
+                        <path d="M50 12 L78 30 L78 68 L50 88 L22 68 L22 30 Z" fill="url(#sapphireGrad)" />
+                        <path d="M50 12 L50 88 L78 30 Z" fill="#00d2ff" opacity="0.3" />
+                        <path d="M50 32 L68 42 L50 52 L32 42 Z" fill="#ffffff" opacity="0.9" />
+                        <path d="M50 52 L68 62 L50 72 L32 62 Z" fill="#ffffff" opacity="0.7" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-1.5">
+                        <span class="font-brand font-black text-xl sm:text-2xl tracking-wider text-white">SAPPHIRE</span>
+                        <span class="hidden sm:inline-block bg-cyan-500/20 text-cyan-300 text-[10px] px-2 py-0.5 rounded-full border border-cyan-400/30 font-semibold">Billing</span>
+                    </div>
+                    <p class="text-[11px] sm:text-xs text-blue-200 tracking-tight sm:tracking-wide">Computer • Printer • CCTV</p>
+                </div>
+            </div>
+
+            <!-- Desktop Quick Actions & Hotline -->
+            <div class="flex items-center space-x-3">
+                <a href="tel:09774789988" class="flex items-center bg-blue-950/80 px-3 py-1.5 rounded-xl border border-blue-400/30 text-xs text-cyan-200 hover:bg-blue-900 transition">
+                    <i class="fa-solid fa-phone-volume text-cyan-400 mr-2 text-sm animate-pulse"></i>
+                    <div>
+                        <span class="block text-[9px] uppercase text-blue-300 font-medium leading-none">Support</span>
+                        <span class="font-bold tracking-wider text-white text-xs sm:text-sm">09774789988</span>
+                    </div>
+                </a>
+
+                <div class="hidden md:flex items-center bg-blue-900/50 p-1 rounded-xl border border-blue-500/30 space-x-1">
+                    <button id="nav-btn-history" onclick="switchTab('history')" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-sapphire-600 text-white shadow">
+                        <i class="fa-solid fa-clock-rotate-left mr-1.5"></i>
+                        <span>History</span>
+                    </button>
+                    <button id="nav-btn-new" onclick="startNewInvoice()" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-blue-200 hover:text-white hover:bg-blue-800/50">
+                        <i class="fa-solid fa-file-circle-plus mr-1.5"></i>
+                        <span>New Invoice</span>
+                    </button>
+                    <button id="nav-btn-settings" onclick="switchTab('settings')" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-blue-200 hover:text-white hover:bg-blue-800/50" title="Store Settings">
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-grow w-full no-print">
+
+        <!-- DASHBOARD STATS BAR -->
+        <div id="stats-bar" class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 mb-4 sm:mb-6">
+            <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200/80 flex items-center space-x-3">
+                <div class="p-2.5 sm:p-3 bg-blue-50 text-sapphire-600 rounded-xl font-bold flex-shrink-0">
+                    <i class="fa-solid fa-file-invoice text-lg sm:text-xl"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[11px] sm:text-xs text-slate-500 font-medium truncate">Total Invoices</p>
+                    <p id="stat-count" class="text-base sm:text-xl font-bold text-slate-800">0</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200/80 flex items-center space-x-3">
+                <div class="p-2.5 sm:p-3 bg-emerald-50 text-emerald-600 rounded-xl font-bold flex-shrink-0">
+                    <i class="fa-solid fa-money-bill-wave text-lg sm:text-xl"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[11px] sm:text-xs text-slate-500 font-medium truncate">Total Revenue</p>
+                    <p id="stat-revenue" class="text-base sm:text-xl font-bold text-emerald-600 truncate">0 Ks</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200/80 flex items-center space-x-3">
+                <div class="p-2.5 sm:p-3 bg-cyan-50 text-cyan-600 rounded-xl font-bold flex-shrink-0">
+                    <i class="fa-solid fa-laptop text-lg sm:text-xl"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[11px] sm:text-xs text-slate-500 font-medium truncate">Items Sold</p>
+                    <p id="stat-items" class="text-base sm:text-xl font-bold text-slate-800">0</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200/80 flex items-center space-x-3">
+                <div class="p-2.5 sm:p-3 bg-indigo-50 text-indigo-600 rounded-xl font-bold flex-shrink-0">
+                    <i class="fa-solid fa-hashtag text-lg sm:text-xl"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[11px] sm:text-xs text-slate-500 font-medium truncate">Next Invoice</p>
+                    <p id="stat-next-num" class="text-base sm:text-xl font-bold text-indigo-600 truncate">INV-0001</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 1: HISTORY & INVOICE LIST -->
+        <section id="tab-history" class="space-y-4">
+            <div class="bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-sapphire-600"></i>
+                        <span>Invoice Records</span>
+                    </h2>
+                    <p class="text-xs text-slate-500">Manage and look back at past generated store receipts.</p>
+                </div>
+
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <div class="relative flex-grow md:w-72">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="search-input" onkeyup="filterHistory()" placeholder="Search Inv #, Customer, Phone..." class="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sapphire-500">
+                    </div>
+                    <button onclick="startNewInvoice()" class="bg-sapphire-600 hover:bg-sapphire-700 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow-md flex items-center space-x-1.5 whitespace-nowrap active:scale-95 transition">
+                        <i class="fa-solid fa-plus"></i>
+                        <span class="hidden sm:inline">Create Invoice</span>
+                        <span class="sm:hidden">New</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Desktop Table View -->
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 overflow-hidden hidden md:block">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase tracking-wider">
+                                <th class="p-4">Invoice No</th>
+                                <th class="p-4">Date</th>
+                                <th class="p-4">Customer</th>
+                                <th class="p-4">Phone</th>
+                                <th class="p-4">Items</th>
+                                <th class="p-4 text-right">Total Amount</th>
+                                <th class="p-4 text-center">Status</th>
+                                <th class="p-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody" class="divide-y divide-slate-100 text-sm">
+                            <!-- Invoices populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Mobile Card View for Invoices -->
+            <div id="history-mobile-list" class="grid grid-cols-1 gap-3 md:hidden">
+                <!-- Mobile invoice items populated dynamically -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="history-empty" class="hidden bg-white p-8 sm:p-12 text-center rounded-xl sm:rounded-2xl border border-slate-200">
+                <div class="w-16 h-16 bg-blue-50 text-sapphire-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-700">No Invoices Found</h3>
+                <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Create your first invoice to start managing store records.</p>
+                <button onclick="startNewInvoice()" class="mt-4 bg-sapphire-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow hover:bg-sapphire-700 transition">
+                    + Create Invoice INV-0001
+                </button>
+            </div>
+        </section>
+
+        <!-- TAB 2: INVOICE FORM (CREATE / EDIT) -->
+        <section id="tab-form" class="hidden space-y-4 sm:space-y-6">
+            
+            <div class="bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center gap-2">
+                <div class="flex items-center space-x-2.5">
+                    <button onclick="switchTab('history')" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition" title="Back to history">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <h2 id="form-title" class="text-base sm:text-lg font-bold text-slate-800 leading-snug">Create Invoice</h2>
+                        <p class="text-[11px] sm:text-xs text-slate-500">Enter receipt info for Sapphire Store.</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button type="button" onclick="resetForm()" class="px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl border border-slate-300 transition">
+                        <i class="fa-solid fa-rotate-left sm:mr-1"></i> <span class="hidden sm:inline">Reset</span>
+                    </button>
+                    <button type="button" onclick="saveAndPreviewInvoice()" class="bg-sapphire-600 hover:bg-sapphire-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md flex items-center space-x-1.5 transition">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Save & View</span>
+                    </button>
+                </div>
+            </div>
+
+            <form id="invoice-form" onsubmit="event.preventDefault(); saveAndPreviewInvoice();" class="space-y-4 sm:space-y-6">
+                <!-- Header Info Box -->
+                <div class="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Invoice # <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="fa-solid fa-hashtag absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="inv-number" required readonly class="w-full pl-9 pr-3 py-2 bg-slate-100 border border-slate-300 rounded-xl text-sm font-bold text-sapphire-700">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Date <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="fa-solid fa-calendar-day absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="date" id="inv-date" required class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sapphire-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Payment Method</label>
+                        <select id="inv-payment-method" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sapphire-500">
+                            <option value="Cash">Cash</option>
+                            <option value="KBZ Pay">KBZ Pay</option>
+                            <option value="AYA Pay">AYA Pay</option>
+                            <option value="WavePay">WavePay</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Customer Info -->
+                <div class="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide mb-3 flex items-center space-x-2 border-b pb-2">
+                        <i class="fa-solid fa-user-tag text-sapphire-600"></i>
+                        <span>Customer Information</span>
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Customer Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="cust-name" required placeholder="e.g. U Thurein Aung" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sapphire-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Phone Number <span class="text-red-500">*</span></label>
+                            <input type="tel" id="cust-phone" required placeholder="e.g. 0912345678" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sapphire-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Address / Location</label>
+                            <input type="text" id="cust-address" placeholder="e.g. Yangon, Kamayut Township" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sapphire-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LINE ITEMS CONTAINER -->
+                <div class="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center border-b pb-3">
+                        <h3 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center space-x-2">
+                            <i class="fa-solid fa-boxes-packing text-sapphire-600"></i>
+                            <span>Items & Services</span>
+                        </h3>
+                        <button type="button" onclick="addItemRow()" class="bg-blue-50 hover:bg-blue-100 text-sapphire-700 px-3 py-1.5 rounded-xl text-xs font-bold border border-blue-200 transition flex items-center space-x-1">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add Row</span>
+                        </button>
+                    </div>
+
+                    <!-- Items Desktop Table -->
+                    <div class="overflow-x-auto hidden sm:block">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-xs font-bold text-slate-500 uppercase border-b bg-slate-50">
+                                    <th class="py-2 px-2 w-8 text-center">#</th>
+                                    <th class="py-2 px-2 w-32">Category</th>
+                                    <th class="py-2 px-2">Item Description / Model</th>
+                                    <th class="py-2 px-2 w-28">Warranty</th>
+                                    <th class="py-2 px-2 w-20 text-center">Qty</th>
+                                    <th class="py-2 px-2 w-28 text-right">Unit Price</th>
+                                    <th class="py-2 px-2 w-28 text-right">Total</th>
+                                    <th class="py-2 px-2 w-10 text-center">Del</th>
+                                </tr>
+                            </thead>
+                            <tbody id="items-tbody">
+                                <!-- Desktop rows inserted dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Items Mobile Card Layout -->
+                    <div id="items-mobile-container" class="space-y-3 sm:hidden">
+                        <!-- Mobile item cards inserted dynamically -->
+                    </div>
+
+                    <!-- Quick Preset Item Buttons -->
+                    <div class="pt-2 flex flex-wrap items-center gap-1.5 text-xs">
+                        <span class="text-slate-400 font-semibold w-full sm:w-auto">Quick Presets:</span>
+                        <button type="button" onclick="quickAddItem('Dell Core i5 Laptop', 'Computer', 1, 1450000, '1 Year')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 text-xs font-medium">
+                            + Laptop
+                        </button>
+                        <button type="button" onclick="quickAddItem('Epson EcoTank L3250 Printer', 'Printer', 1, 620000, '6 Months')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 text-xs font-medium">
+                            + Printer
+                        </button>
+                        <button type="button" onclick="quickAddItem('Dahua 2MP Outdoor CCTV Camera', 'CCTV', 4, 85000, '1 Year')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 text-xs font-medium">
+                            + CCTV
+                        </button>
+                        <button type="button" onclick="quickAddItem('Kingston 512GB NVMe SSD', 'Accessories', 1, 125000, '2 Years')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 text-xs font-medium">
+                            + SSD
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BILLING SUMMARY & TERMS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <!-- Terms & Notes -->
+                    <div class="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 space-y-2">
+                        <label class="block text-xs font-bold text-slate-700 uppercase">Terms & Service Notes</label>
+                        <textarea id="inv-notes" rows="4" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-700 leading-relaxed"></textarea>
+                    </div>
+
+                    <!-- Totals Calculation Card -->
+                    <div class="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 space-y-2.5">
+                        <div class="flex justify-between items-center text-xs sm:text-sm">
+                            <span class="text-slate-600 font-medium">Subtotal Amount:</span>
+                            <span id="summary-subtotal" class="font-bold text-slate-800">0 Ks</span>
+                        </div>
+
+                        <div class="flex justify-between items-center text-xs sm:text-sm">
+                            <span class="text-slate-600 font-medium">Discount (Ks):</span>
+                            <input type="number" id="inv-discount" value="0" min="0" oninput="calculateTotals()" class="w-28 sm:w-32 px-3 py-1 bg-slate-50 border border-slate-300 rounded-lg text-right text-xs sm:text-sm font-semibold">
+                        </div>
+
+                        <div class="flex justify-between items-center text-xs sm:text-sm">
+                            <span class="text-slate-600 font-medium">Tax / Fee (Ks):</span>
+                            <input type="number" id="inv-tax" value="0" min="0" oninput="calculateTotals()" class="w-28 sm:w-32 px-3 py-1 bg-slate-50 border border-slate-300 rounded-lg text-right text-xs sm:text-sm font-semibold">
+                        </div>
+
+                        <div class="border-t border-slate-200 pt-2 flex justify-between items-center">
+                            <span class="text-sm sm:text-base font-bold text-slate-800">Total Payable:</span>
+                            <span id="summary-total" class="text-xl sm:text-2xl font-extrabold text-sapphire-700">0 Ks</span>
+                        </div>
+
+                        <div class="pt-1 grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Paid Amount (Ks)</label>
+                                <input type="number" id="inv-paid" value="0" min="0" oninput="calculateTotals()" class="w-full px-3 py-1.5 bg-emerald-50/60 border border-emerald-300 rounded-xl text-right text-xs sm:text-sm font-bold text-emerald-700">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Balance Due</label>
+                                <div id="summary-balance" class="w-full px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-right text-xs sm:text-sm font-bold text-rose-600">0 Ks</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button Bar -->
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="switchTab('history')" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs sm:text-sm font-semibold transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="bg-sapphire-600 hover:bg-sapphire-700 text-white px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow-lg flex items-center space-x-2 transition">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Save & View Printable Receipt</span>
+                    </button>
+                </div>
+
+            </form>
+        </section>
+
+        <!-- TAB 3: STORE SETTINGS -->
+        <section id="tab-settings" class="hidden space-y-6">
+            <div class="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 max-w-2xl mx-auto space-y-4">
+                <div class="border-b pb-3">
+                    <h2 class="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-store text-sapphire-600"></i>
+                        <span>SAPPHIRE Store Settings</span>
+                    </h2>
+                    <p class="text-xs text-slate-500">Configure store info printed on invoice headers.</p>
+                </div>
+
+                <div class="space-y-3 text-xs sm:text-sm">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Store Name</label>
+                        <input type="text" id="setting-store-name" value="SAPPHIRE" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-bold text-sapphire-800">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Tagline</label>
+                        <input type="text" id="setting-tagline" value="Computer • Printer • CCTV | Sale and Service" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Phone Hotline</label>
+                        <input type="text" id="setting-phone" value="09774789988" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Store Address</label>
+                        <input type="text" id="setting-address" value="Computer Plaza, Yangon" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Currency Symbol</label>
+                        <input type="text" id="setting-currency" value="Ks" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Default Terms & Warranty Policy</label>
+                        <textarea id="setting-terms" rows="4" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs"></textarea>
+                    </div>
+                </div>
+
+                <div class="pt-3 flex justify-between items-center border-t">
+                    <button type="button" onclick="clearAllData()" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl text-xs font-bold transition">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Reset All Data
+                    </button>
+                    <button type="button" onclick="saveSettings()" class="bg-sapphire-600 hover:bg-sapphire-700 text-white px-5 py-2 rounded-xl text-xs font-bold shadow">
+                        Save Settings
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION DOCK -->
+    <nav id="mobile-bottom-nav" class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 text-white z-40 md:hidden no-print">
+        <div class="grid grid-cols-3 text-center py-2">
+            <button onclick="switchTab('history')" id="mob-nav-history" class="flex flex-col items-center justify-center py-1 text-cyan-400">
+                <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+                <span class="text-[10px] font-bold mt-0.5">Invoices</span>
+            </button>
+            <button onclick="startNewInvoice()" id="mob-nav-new" class="flex flex-col items-center justify-center py-1 text-slate-400">
+                <i class="fa-solid fa-file-circle-plus text-lg"></i>
+                <span class="text-[10px] font-medium mt-0.5">+ New</span>
+            </button>
+            <button onclick="switchTab('settings')" id="mob-nav-settings" class="flex flex-col items-center justify-center py-1 text-slate-400">
+                <i class="fa-solid fa-gear text-lg"></i>
+                <span class="text-[10px] font-medium mt-0.5">Settings</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- INVOICE PREVIEW & PRINT MODAL -->
+    <div id="invoice-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-0 sm:p-4 hidden overflow-y-auto">
+        <div class="bg-white w-full h-full sm:h-auto sm:max-w-3xl sm:rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-full sm:max-h-[92vh]">
+            
+            <!-- Modal Actions Header -->
+            <div class="bg-slate-900 text-white px-4 py-3 flex justify-between items-center no-print flex-shrink-0">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-file-invoice text-cyan-400"></i>
+                    <span class="font-bold text-xs sm:text-sm">Invoice Preview</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="window.print()" class="bg-sapphire-600 hover:bg-sapphire-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Print / PDF</span>
+                    </button>
+                    <button onclick="closePreviewModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PRINTABLE RECEIPT CONTENT -->
+            <div class="p-4 sm:p-6 overflow-y-auto bg-white flex-grow" id="printable-invoice">
+                
+                <!-- SAPPHIRE HEADER EMBLEM -->
+                <div class="border-2 border-blue-900 rounded-2xl p-4 mb-4 sm:mb-6 bg-gradient-to-r from-blue-50/50 via-white to-blue-50/50">
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 text-center sm:text-left">
+                        
+                        <div class="flex items-center space-x-3">
+                            <div class="w-16 h-16 bg-white rounded-full p-1 shadow-md border-2 border-blue-900 flex-shrink-0 flex items-center justify-center">
+                                <svg viewBox="0 0 100 100" class="w-full h-full">
+                                    <circle cx="50" cy="50" r="48" fill="none" stroke="#0048aa" stroke-width="2"/>
+                                    <path d="M50 12 L78 30 L78 68 L50 88 L22 68 L22 30 Z" fill="url(#sapphireGradModal)" />
+                                    <path d="M50 12 L50 88 L78 30 Z" fill="#00d2ff" opacity="0.4" />
+                                    <path d="M50 32 L68 42 L50 52 L32 42 Z" fill="#ffffff" opacity="0.9" />
+                                    <path d="M50 52 L68 62 L50 72 L32 62 Z" fill="#ffffff" opacity="0.7" />
+                                    <defs>
+                                        <linearGradient id="sapphireGradModal" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#00d2ff" />
+                                            <stop offset="50%" stop-color="#0048aa" />
+                                            <stop offset="100%" stop-color="#03122e" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 class="font-brand font-black text-2xl sm:text-3xl tracking-widest text-blue-900 leading-none">SAPPHIRE</h1>
+                                <p class="text-[10px] sm:text-xs font-bold text-blue-800 tracking-wider uppercase border-t border-b border-blue-900/20 py-0.5 my-1">
+                                    Computer • Printer • CCTV
+                                </p>
+                                <p class="text-[10px] sm:text-xs font-bold text-blue-950">Sale and Service</p>
+                            </div>
+                        </div>
+
+                        <div class="text-xs space-y-1 sm:text-right border-t sm:border-t-0 sm:border-l border-blue-200 pt-2 sm:pt-0 sm:pl-4 w-full sm:w-auto">
+                            <p class="font-bold text-blue-900 text-xs sm:text-sm" id="p-store-phone"><i class="fa-solid fa-phone text-blue-700 mr-1"></i> Phone: 09774789988</p>
+                            <p class="text-slate-600 text-[11px]" id="p-store-address">Computer Plaza, Yangon</p>
+                            <span class="inline-block bg-blue-900 text-white px-2.5 py-0.5 rounded font-bold text-[10px] uppercase tracking-wider mt-0.5">INVOICE / RECEIPT</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- METADATA & CUSTOMER -->
+                <div class="grid grid-cols-2 gap-3 mb-4 text-xs">
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-0.5">
+                        <p class="font-bold text-slate-500 uppercase text-[9px]">Customer Details:</p>
+                        <p class="font-bold text-slate-900 text-xs sm:text-sm" id="p-cust-name">-</p>
+                        <p class="text-slate-700 text-[11px]" id="p-cust-phone"><i class="fa-solid fa-phone text-slate-400 text-[9px] mr-1"></i> -</p>
+                        <p class="text-slate-600 text-[11px]" id="p-cust-address"><i class="fa-solid fa-location-dot text-slate-400 text-[9px] mr-1"></i> -</p>
+                    </div>
+
+                    <div class="bg-blue-50/50 border border-blue-200 rounded-xl p-3 space-y-0.5 text-right">
+                        <p class="font-bold text-blue-800 uppercase text-[9px]">Invoice Ref:</p>
+                        <p class="font-extrabold text-blue-900 text-sm sm:text-base" id="p-inv-number">INV-0001</p>
+                        <p class="text-slate-700 text-[11px]"><strong>Date:</strong> <span id="p-inv-date">-</span></p>
+                        <p class="text-slate-700 text-[11px]"><strong>Payment:</strong> <span id="p-inv-payment">Cash</span></p>
+                    </div>
+                </div>
+
+                <!-- ITEMS TABLE FOR PRINT PREVIEW -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden mb-4">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="bg-blue-900 text-white font-bold uppercase text-[11px]">
+                                <th class="p-2 w-6 text-center">#</th>
+                                <th class="p-2">Item Description</th>
+                                <th class="p-2 w-20">Warranty</th>
+                                <th class="p-2 w-8 text-center">Qty</th>
+                                <th class="p-2 w-20 text-right">Unit Price</th>
+                                <th class="p-2 w-24 text-right">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="p-items-tbody" class="divide-y divide-slate-200 text-[11px]">
+                            <!-- Print items inserted dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- TOTALS SECTION -->
+                <div class="flex flex-col sm:flex-row justify-between items-start gap-3 mb-6">
+                    <div class="text-xs space-y-1 w-full sm:w-1/2">
+                        <div class="bg-slate-50 border border-slate-200 p-2.5 rounded-xl">
+                            <p class="font-bold text-slate-700 text-[11px] mb-0.5 border-b pb-0.5">Warranty & Service Policy:</p>
+                            <p id="p-inv-notes" class="text-[10px] text-slate-600 leading-relaxed whitespace-pre-line">-</p>
+                        </div>
+                    </div>
+
+                    <div class="w-full sm:w-1/2 text-xs space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div class="flex justify-between text-slate-600 text-[11px]">
+                            <span>Subtotal:</span>
+                            <span id="p-subtotal" class="font-bold text-slate-800">0 Ks</span>
+                        </div>
+                        <div class="flex justify-between text-slate-600 text-[11px]">
+                            <span>Discount:</span>
+                            <span id="p-discount" class="font-semibold text-emerald-600">0 Ks</span>
+                        </div>
+                        <div class="flex justify-between text-slate-600 text-[11px]">
+                            <span>Tax / Fee:</span>
+                            <span id="p-tax" class="font-semibold text-slate-800">0 Ks</span>
+                        </div>
+                        <div class="border-t border-slate-300 pt-1 flex justify-between items-center text-xs sm:text-sm">
+                            <span class="font-bold text-blue-900">Total Payable:</span>
+                            <span id="p-total" class="font-extrabold text-blue-900 text-sm sm:text-base">0 Ks</span>
+                        </div>
+                        <div class="flex justify-between text-emerald-700 pt-0.5 font-semibold text-[11px]">
+                            <span>Paid Amount:</span>
+                            <span id="p-paid">0 Ks</span>
+                        </div>
+                        <div class="flex justify-between text-rose-600 font-bold border-t border-dashed pt-0.5 text-[11px]">
+                            <span>Balance Due:</span>
+                            <span id="p-balance">0 Ks</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER BRANDING & SIGNATURES -->
+                <div class="border-t-2 border-blue-900 pt-3 mt-4">
+                    <div class="text-center mb-4">
+                        <p class="font-bold text-[10px] tracking-widest text-blue-950 uppercase">
+                            QUALITY PRODUCTS • RELIABLE SERVICE • YOUR TRUST, OUR PRIORITY
+                        </p>
+                        <p class="text-[9px] text-slate-500 mt-0.5">Thank you for choosing SAPPHIRE Computer • Printer • CCTV Store!</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 text-center text-[11px] pt-2">
+                        <div>
+                            <div class="border-b border-slate-400 w-2/3 mx-auto mb-1 h-6"></div>
+                            <p class="font-semibold text-slate-700">Customer Signature</p>
+                        </div>
+                        <div>
+                            <div class="border-b border-slate-400 w-2/3 mx-auto mb-1 h-6"></div>
+                            <p class="font-semibold text-slate-700">Authorized Signature & Stamp</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-16 sm:bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-xl z-50 flex items-center space-x-2.5 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none text-xs">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-msg" class="font-semibold">Action completed</span>
+    </div>
+
+    <script>
+        /* STORAGE KEYS AND APP STATE */
+        const STORAGE_INVOICES_KEY = 'sapphire_invoices_v2';
+        const STORAGE_SETTINGS_KEY = 'sapphire_settings_v2';
+        const STORAGE_COUNTER_KEY = 'sapphire_counter_v2';
+
+        let invoices = [];
+        let settings = {
+            storeName: 'SAPPHIRE',
+            tagline: 'Computer • Printer • CCTV | Sale and Service',
+            phone: '09774789988',
+            address: 'Computer Plaza, Yangon',
+            currency: 'Ks',
+            terms: '1. Warranty valid only with original invoice.\n2. Physical damage, water ingress, or burnt chips void warranty.\n3. CCTV & Printer service check within 3 working days.'
+        };
+        let counter = 1;
+        let editingInvoiceId = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromStorage();
+            initializeDate();
+            renderHistory();
+            updateDashboardStats();
+        });
+
+        function loadFromStorage() {
+            const savedSettings = localStorage.getItem(STORAGE_SETTINGS_KEY);
+            if (savedSettings) {
+                try { settings = JSON.parse(savedSettings); } catch(e){}
+            }
+            document.getElementById('setting-store-name').value = settings.storeName || 'SAPPHIRE';
+            document.getElementById('setting-tagline').value = settings.tagline || '';
+            document.getElementById('setting-phone').value = settings.phone || '09774789988';
+            document.getElementById('setting-address').value = settings.address || '';
+            document.getElementById('setting-currency').value = settings.currency || 'Ks';
+            document.getElementById('setting-terms').value = settings.terms || '';
+
+            const savedInvoices = localStorage.getItem(STORAGE_INVOICES_KEY);
+            if (savedInvoices) {
+                try { invoices = JSON.parse(savedInvoices); } catch(e){ invoices = []; }
+            }
+
+            const savedCounter = localStorage.getItem(STORAGE_COUNTER_KEY);
+            if (savedCounter) {
+                counter = parseInt(savedCounter, 10) || 1;
+            } else if (invoices.length > 0) {
+                counter = invoices.length + 1;
+            }
+        }
+
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_INVOICES_KEY, JSON.stringify(invoices));
+            localStorage.setItem(STORAGE_COUNTER_KEY, counter.toString());
+            localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(settings));
+            updateDashboardStats();
+        }
+
+        function initializeDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('inv-date').value = today;
+            document.getElementById('inv-notes').value = settings.terms;
+        }
+
+        function getNextInvoiceNumber() {
+            const numStr = counter.toString().padStart(4, '0');
+            return `INV-${numStr}`;
+        }
+
+        function switchTab(tabName) {
+            document.getElementById('tab-history').classList.add('hidden');
+            document.getElementById('tab-form').classList.add('hidden');
+            document.getElementById('tab-settings').classList.add('hidden');
+
+            // Reset desktop nav
+            ['nav-btn-history', 'nav-btn-new', 'nav-btn-settings'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.className = 'px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-blue-200 hover:text-white hover:bg-blue-800/50';
+            });
+
+            // Reset mobile nav buttons
+            ['mob-nav-history', 'mob-nav-new', 'mob-nav-settings'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.className = 'flex flex-col items-center justify-center py-1 text-slate-400';
+            });
+
+            if (tabName === 'history') {
+                document.getElementById('tab-history').classList.remove('hidden');
+                document.getElementById('nav-btn-history').className = 'px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-sapphire-600 text-white shadow';
+                document.getElementById('mob-nav-history').className = 'flex flex-col items-center justify-center py-1 text-cyan-400 font-bold';
+                renderHistory();
+            } else if (tabName === 'form') {
+                document.getElementById('tab-form').classList.remove('hidden');
+                document.getElementById('nav-btn-new').className = 'px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-sapphire-600 text-white shadow';
+                document.getElementById('mob-nav-new').className = 'flex flex-col items-center justify-center py-1 text-cyan-400 font-bold';
+            } else if (tabName === 'settings') {
+                document.getElementById('tab-settings').classList.remove('hidden');
+                document.getElementById('nav-btn-settings').className = 'px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-sapphire-600 text-white shadow';
+                document.getElementById('mob-nav-settings').className = 'flex flex-col items-center justify-center py-1 text-cyan-400 font-bold';
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function startNewInvoice() {
+            editingInvoiceId = null;
+            document.getElementById('form-title').innerText = 'Create New Invoice';
+            resetForm();
+            document.getElementById('inv-number').value = getNextInvoiceNumber();
+            switchTab('form');
+        }
+
+        function resetForm() {
+            document.getElementById('cust-name').value = '';
+            document.getElementById('cust-phone').value = '';
+            document.getElementById('cust-address').value = '';
+            document.getElementById('inv-discount').value = 0;
+            document.getElementById('inv-tax').value = 0;
+            document.getElementById('inv-paid').value = 0;
+            document.getElementById('inv-notes').value = settings.terms;
+            initializeDate();
+
+            document.getElementById('items-tbody').innerHTML = '';
+            document.getElementById('items-mobile-container').innerHTML = '';
+            addItemRow();
+            calculateTotals();
+        }
+
+        function addItemRow(cat = 'Computer', desc = '', qty = 1, price = 0, warranty = '1 Year') {
+            const tbody = document.getElementById('items-tbody');
+            const mobileContainer = document.getElementById('items-mobile-container');
+            const rowIdx = tbody.children.length + 1;
+            const itemId = 'item_row_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+
+            // Desktop Table Row
+            const tr = document.createElement('tr');
+            tr.id = itemId + '_dt';
+            tr.className = 'border-b border-slate-100 hover:bg-slate-50/50 transition';
+            tr.innerHTML = `
+                <td class="py-2 px-2 text-center text-xs font-bold text-slate-400 row-idx">${rowIdx}</td>
+                <td class="py-2 px-2">
+                    <select class="item-cat w-full p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium" onchange="syncItemRow('${itemId}', 'cat', this.value)">
+                        <option value="Computer" ${cat==='Computer'?'selected':''}>Computer / Laptop</option>
+                        <option value="Printer" ${cat==='Printer'?'selected':''}>Printer / Ink</option>
+                        <option value="CCTV" ${cat==='CCTV'?'selected':''}>CCTV / Security</option>
+                        <option value="Accessories" ${cat==='Accessories'?'selected':''}>Accessories / SSD</option>
+                        <option value="Service" ${cat==='Service'?'selected':''}>Service / Repair</option>
+                    </select>
+                </td>
+                <td class="py-2 px-2">
+                    <input type="text" class="item-desc w-full p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-sapphire-500" placeholder="Model name or specs..." value="${escapeHtml(desc)}" oninput="syncItemRow('${itemId}', 'desc', this.value)">
+                </td>
+                <td class="py-2 px-2">
+                    <input type="text" class="item-warranty w-full p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs" placeholder="e.g. 1 Year" value="${escapeHtml(warranty)}" oninput="syncItemRow('${itemId}', 'warranty', this.value)">
+                </td>
+                <td class="py-2 px-2">
+                    <input type="number" min="1" class="item-qty w-full p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-center font-bold" value="${qty}" oninput="syncItemRow('${itemId}', 'qty', this.value); calculateTotals();">
+                </td>
+                <td class="py-2 px-2">
+                    <input type="number" min="0" class="item-price w-full p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-right font-semibold" value="${price}" oninput="syncItemRow('${itemId}', 'price', this.value); calculateTotals();">
+                </td>
+                <td class="py-2 px-2 text-right font-bold text-slate-800 text-xs item-total">
+                    0 ${settings.currency}
+                </td>
+                <td class="py-2 px-2 text-center">
+                    <button type="button" onclick="removeItemRow('${itemId}')" class="text-rose-500 hover:text-rose-700 p-1">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+
+            // Mobile Card View
+            const mobCard = document.createElement('div');
+            mobCard.id = itemId + '_mb';
+            mobCard.className = 'bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 relative';
+            mobCard.innerHTML = `
+                <div class="flex justify-between items-center border-b pb-1.5">
+                    <span class="text-xs font-bold text-sapphire-700">Item #${rowIdx}</span>
+                    <button type="button" onclick="removeItemRow('${itemId}')" class="text-rose-500 text-xs font-bold flex items-center space-x-1 px-2 py-0.5 bg-rose-50 rounded-md">
+                        <i class="fa-solid fa-trash-can"></i> <span>Remove</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Category</label>
+                        <select class="item-cat w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium" onchange="syncItemRow('${itemId}', 'cat', this.value)">
+                            <option value="Computer" ${cat==='Computer'?'selected':''}>Computer</option>
+                            <option value="Printer" ${cat==='Printer'?'selected':''}>Printer</option>
+                            <option value="CCTV" ${cat==='CCTV'?'selected':''}>CCTV</option>
+                            <option value="Accessories" ${cat==='Accessories'?'selected':''}>Accessories</option>
+                            <option value="Service" ${cat==='Service'?'selected':''}>Service</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Warranty</label>
+                        <input type="text" class="item-warranty w-full p-2 bg-white border border-slate-300 rounded-lg text-xs" placeholder="e.g. 1 Year" value="${escapeHtml(warranty)}" oninput="syncItemRow('${itemId}', 'warranty', this.value)">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Description / Model Name</label>
+                    <input type="text" class="item-desc w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold" placeholder="Product name or model..." value="${escapeHtml(desc)}" oninput="syncItemRow('${itemId}', 'desc', this.value)">
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 items-center">
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Qty</label>
+                        <input type="number" min="1" class="item-qty w-full p-2 bg-white border border-slate-300 rounded-lg text-xs text-center font-bold" value="${qty}" oninput="syncItemRow('${itemId}', 'qty', this.value); calculateTotals();">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Price (${settings.currency})</label>
+                        <input type="number" min="0" class="item-price w-full p-2 bg-white border border-slate-300 rounded-lg text-xs text-right font-semibold" value="${price}" oninput="syncItemRow('${itemId}', 'price', this.value); calculateTotals();">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Total</label>
+                        <div class="item-total p-2 text-right font-extrabold text-slate-800 text-xs">0 ${settings.currency}</div>
+                    </div>
+                </div>
+            `;
+            mobileContainer.appendChild(mobCard);
+            calculateTotals();
+        }
+
+        function syncItemRow(itemId, field, value) {
+            const dtRow = document.getElementById(itemId + '_dt');
+            const mbCard = document.getElementById(itemId + '_mb');
+
+            if (dtRow && mbCard) {
+                if (field === 'cat') {
+                    dtRow.querySelector('.item-cat').value = value;
+                    mbCard.querySelector('.item-cat').value = value;
+                } else if (field === 'desc') {
+                    dtRow.querySelector('.item-desc').value = value;
+                    mbCard.querySelector('.item-desc').value = value;
+                } else if (field === 'warranty') {
+                    dtRow.querySelector('.item-warranty').value = value;
+                    mbCard.querySelector('.item-warranty').value = value;
+                } else if (field === 'qty') {
+                    dtRow.querySelector('.item-qty').value = value;
+                    mbCard.querySelector('.item-qty').value = value;
+                } else if (field === 'price') {
+                    dtRow.querySelector('.item-price').value = value;
+                    mbCard.querySelector('.item-price').value = value;
+                }
+            }
+        }
+
+        function removeItemRow(itemId) {
+            const tbody = document.getElementById('items-tbody');
+            if (tbody.children.length > 1) {
+                const dtRow = document.getElementById(itemId + '_dt');
+                const mbCard = document.getElementById(itemId + '_mb');
+                if (dtRow) dtRow.remove();
+                if (mbCard) mbCard.remove();
+                updateRowIndexes();
+                calculateTotals();
+            } else {
+                showToast('At least one item is required.', 'warning');
+            }
+        }
+
+        function updateRowIndexes() {
+            const dtRows = document.querySelectorAll('#items-tbody tr');
+            dtRows.forEach((row, idx) => {
+                const idxEl = row.querySelector('.row-idx');
+                if (idxEl) idxEl.innerText = idx + 1;
+            });
+
+            const mbCards = document.querySelectorAll('#items-mobile-container > div');
+            mbCards.forEach((card, idx) => {
+                const headerEl = card.querySelector('.text-sapphire-700');
+                if (headerEl) headerEl.innerText = `Item #${idx + 1}`;
+            });
+        }
+
+        function quickAddItem(desc, cat, qty, price, warranty) {
+            addItemRow(cat, desc, qty, price, warranty);
+            showToast(`Added ${desc}`, 'success');
+        }
+
+        function calculateTotals() {
+            let subtotal = 0;
+            const rows = document.querySelectorAll('#items-tbody tr');
+
+            rows.forEach(row => {
+                const qty = parseFloat(row.querySelector('.item-qty')?.value) || 0;
+                const price = parseFloat(row.querySelector('.item-price')?.value) || 0;
+                const total = qty * price;
+                subtotal += total;
+
+                const dtTotalEl = row.querySelector('.item-total');
+                if (dtTotalEl) dtTotalEl.innerText = `${total.toLocaleString()} ${settings.currency}`;
+
+                // Sync mobile card total display
+                const itemId = row.id.replace('_dt', '_mb');
+                const mbCard = document.getElementById(itemId);
+                if (mbCard) {
+                    const mbTotalEl = mbCard.querySelector('.item-total');
+                    if (mbTotalEl) mbTotalEl.innerText = `${total.toLocaleString()} ${settings.currency}`;
+                }
+            });
+
+            const discount = parseFloat(document.getElementById('inv-discount').value) || 0;
+            const tax = parseFloat(document.getElementById('inv-tax').value) || 0;
+            const totalPayable = Math.max(0, subtotal - discount + tax);
+            
+            const paid = parseFloat(document.getElementById('inv-paid').value) || 0;
+            const balance = totalPayable - paid;
+
+            document.getElementById('summary-subtotal').innerText = `${subtotal.toLocaleString()} ${settings.currency}`;
+            document.getElementById('summary-total').innerText = `${totalPayable.toLocaleString()} ${settings.currency}`;
+            
+            const balanceEl = document.getElementById('summary-balance');
+            balanceEl.innerText = `${balance.toLocaleString()} ${settings.currency}`;
+            if (balance > 0) {
+                balanceEl.className = 'w-full px-3 py-1.5 bg-rose-50 border border-rose-200 rounded-xl text-right text-xs sm:text-sm font-bold text-rose-600';
+            } else {
+                balanceEl.className = 'w-full px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-xl text-right text-xs sm:text-sm font-bold text-emerald-600';
+            }
+        }
+
+        function saveAndPreviewInvoice() {
+            const custName = document.getElementById('cust-name').value.trim();
+            const custPhone = document.getElementById('cust-phone').value.trim();
+
+            if (!custName || !custPhone) {
+                showToast('Please enter customer name and phone', 'error');
+                return;
+            }
+
+            const items = [];
+            const rows = document.querySelectorAll('#items-tbody tr');
+            rows.forEach(row => {
+                const desc = row.querySelector('.item-desc').value.trim();
+                if (desc) {
+                    items.push({
+                        cat: row.querySelector('.item-cat').value,
+                        desc: desc,
+                        warranty: row.querySelector('.item-warranty').value.trim() || 'No Warranty',
+                        qty: parseFloat(row.querySelector('.item-qty').value) || 1,
+                        price: parseFloat(row.querySelector('.item-price').value) || 0
+                    });
+                }
+            });
+
+            if (items.length === 0) {
+                showToast('Please enter description for at least 1 item.', 'error');
+                return;
+            }
+
+            const invNum = document.getElementById('inv-number').value;
+            const invDate = document.getElementById('inv-date').value;
+            const paymentMethod = document.getElementById('inv-payment-method').value;
+            const custAddress = document.getElementById('cust-address').value.trim();
+            const discount = parseFloat(document.getElementById('inv-discount').value) || 0;
+            const tax = parseFloat(document.getElementById('inv-tax').value) || 0;
+            const paid = parseFloat(document.getElementById('inv-paid').value) || 0;
+            const notes = document.getElementById('inv-notes').value.trim();
+
+            const subtotal = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
+            const totalPayable = Math.max(0, subtotal - discount + tax);
+
+            const invoiceData = {
+                id: editingInvoiceId || 'inv_' + Date.now(),
+                invNumber: invNum,
+                date: invDate,
+                paymentMethod: paymentMethod,
+                customer: {
+                    name: custName,
+                    phone: custPhone,
+                    address: custAddress
+                },
+                items: items,
+                subtotal: subtotal,
+                discount: discount,
+                tax: tax,
+                total: totalPayable,
+                paid: paid,
+                notes: notes,
+                timestamp: Date.now()
+            };
+
+            if (editingInvoiceId) {
+                const idx = invoices.findIndex(i => i.id === editingInvoiceId);
+                if (idx !== -1) invoices[idx] = invoiceData;
+                showToast(`Updated ${invNum}`, 'success');
+            } else {
+                invoices.unshift(invoiceData);
+                counter++;
+                showToast(`Saved ${invNum}`, 'success');
+            }
+
+            saveToStorage();
+            populatePreviewModal(invoiceData);
+            document.getElementById('invoice-modal').classList.remove('hidden');
+        }
+
+        function populatePreviewModal(inv) {
+            document.getElementById('p-store-phone').innerHTML = `<i class="fa-solid fa-phone text-blue-700 mr-1"></i> Phone: ${settings.phone}`;
+            document.getElementById('p-store-address').innerText = settings.address;
+
+            document.getElementById('p-inv-number').innerText = inv.invNumber;
+            document.getElementById('p-inv-date').innerText = inv.date;
+            document.getElementById('p-inv-payment').innerText = inv.paymentMethod;
+
+            document.getElementById('p-cust-name').innerText = inv.customer.name;
+            document.getElementById('p-cust-phone').innerText = inv.customer.phone;
+            document.getElementById('p-cust-address').innerText = inv.customer.address || 'N/A';
+
+            document.getElementById('p-inv-notes').innerText = inv.notes || 'No warranty notes.';
+
+            const tbody = document.getElementById('p-items-tbody');
+            tbody.innerHTML = '';
+            inv.items.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="p-2 text-center text-slate-500 font-bold">${idx + 1}</td>
+                    <td class="p-2">
+                        <span class="font-bold text-slate-800">${escapeHtml(item.desc)}</span>
+                        <span class="block text-[9px] text-slate-400 font-medium">[${item.cat}]</span>
+                    </td>
+                    <td class="p-2 text-slate-600 font-medium">${escapeHtml(item.warranty)}</td>
+                    <td class="p-2 text-center font-bold text-slate-800">${item.qty}</td>
+                    <td class="p-2 text-right font-semibold text-slate-700">${item.price.toLocaleString()} ${settings.currency}</td>
+                    <td class="p-2 text-right font-extrabold text-slate-900">${(item.qty * item.price).toLocaleString()} ${settings.currency}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('p-subtotal').innerText = `${inv.subtotal.toLocaleString()} ${settings.currency}`;
+            document.getElementById('p-discount').innerText = `${inv.discount.toLocaleString()} ${settings.currency}`;
+            document.getElementById('p-tax').innerText = `${inv.tax.toLocaleString()} ${settings.currency}`;
+            document.getElementById('p-total').innerText = `${inv.total.toLocaleString()} ${settings.currency}`;
+            document.getElementById('p-paid').innerText = `${inv.paid.toLocaleString()} ${settings.currency}`;
+            
+            const bal = inv.total - inv.paid;
+            document.getElementById('p-balance').innerText = `${bal.toLocaleString()} ${settings.currency}`;
+        }
+
+        function closePreviewModal() {
+            document.getElementById('invoice-modal').classList.add('hidden');
+            switchTab('history');
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('history-tbody');
+            const mobList = document.getElementById('history-mobile-list');
+            const emptyState = document.getElementById('history-empty');
+
+            tbody.innerHTML = '';
+            mobList.innerHTML = '';
+
+            const searchTerm = (document.getElementById('search-input')?.value || '').toLowerCase();
+
+            const filtered = invoices.filter(inv => {
+                return inv.invNumber.toLowerCase().includes(searchTerm) ||
+                       inv.customer.name.toLowerCase().includes(searchTerm) ||
+                       inv.customer.phone.toLowerCase().includes(searchTerm) ||
+                       inv.date.includes(searchTerm);
+            });
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            filtered.forEach(inv => {
+                const bal = inv.total - inv.paid;
+                let statusBadge = '<span class="bg-emerald-100 text-emerald-800 text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full font-bold">PAID</span>';
+                if (bal > 0 && inv.paid > 0) {
+                    statusBadge = '<span class="bg-amber-100 text-amber-800 text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full font-bold">PARTIAL</span>';
+                } else if (bal > 0 && inv.paid === 0) {
+                    statusBadge = '<span class="bg-rose-100 text-rose-800 text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full font-bold">UNPAID</span>';
+                }
+
+                const itemCount = inv.items.reduce((s, i) => s + i.qty, 0);
+
+                // Desktop Table Row
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+                tr.innerHTML = `
+                    <td class="p-4 font-extrabold text-sapphire-700">${inv.invNumber}</td>
+                    <td class="p-4 text-slate-600 font-medium text-xs">${inv.date}</td>
+                    <td class="p-4">
+                        <div class="font-bold text-slate-800">${escapeHtml(inv.customer.name)}</div>
+                        <div class="text-[11px] text-slate-400">${inv.customer.address || ''}</div>
+                    </td>
+                    <td class="p-4 text-slate-700 font-semibold text-xs">${escapeHtml(inv.customer.phone)}</td>
+                    <td class="p-4 text-slate-600 text-xs">
+                        <span class="bg-slate-100 px-2 py-0.5 rounded-md font-bold">${itemCount} items</span>
+                    </td>
+                    <td class="p-4 text-right font-extrabold text-slate-900">${inv.total.toLocaleString()} ${settings.currency}</td>
+                    <td class="p-4 text-center">${statusBadge}</td>
+                    <td class="p-4 text-center">
+                        <div class="flex items-center justify-center space-x-1">
+                            <button onclick="viewInvoice('${inv.id}')" class="p-1.5 text-sapphire-600 hover:bg-blue-50 rounded-lg" title="View / Print">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button onclick="editInvoice('${inv.id}')" class="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg" title="Edit">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="deleteInvoice('${inv.id}')" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg" title="Delete">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+
+                // Mobile Card Item
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-2';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <div>
+                            <span class="font-extrabold text-sapphire-700 text-sm">${inv.invNumber}</span>
+                            <span class="text-[10px] text-slate-400 block">${inv.date}</span>
+                        </div>
+                        <div>${statusBadge}</div>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs">
+                        <div>
+                            <p class="font-bold text-slate-800">${escapeHtml(inv.customer.name)}</p>
+                            <p class="text-[11px] text-slate-500"><i class="fa-solid fa-phone mr-1"></i>${escapeHtml(inv.customer.phone)}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-extrabold text-slate-900 text-sm">${inv.total.toLocaleString()} ${settings.currency}</p>
+                            <p class="text-[10px] text-slate-400">${itemCount} items</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-100 flex justify-end space-x-2 text-xs">
+                        <button onclick="viewInvoice('${inv.id}')" class="bg-blue-50 text-sapphire-700 font-bold px-3 py-1.5 rounded-lg flex items-center space-x-1">
+                            <i class="fa-solid fa-eye"></i> <span>View</span>
+                        </button>
+                        <button onclick="editInvoice('${inv.id}')" class="bg-amber-50 text-amber-700 font-bold px-3 py-1.5 rounded-lg flex items-center space-x-1">
+                            <i class="fa-solid fa-pen-to-square"></i> <span>Edit</span>
+                        </button>
+                        <button onclick="deleteInvoice('${inv.id}')" class="bg-rose-50 text-rose-600 font-bold px-3 py-1.5 rounded-lg flex items-center space-x-1">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                `;
+                mobList.appendChild(card);
+            });
+        }
+
+        function filterHistory() {
+            renderHistory();
+        }
+
+        function viewInvoice(id) {
+            const inv = invoices.find(i => i.id === id);
+            if (inv) {
+                populatePreviewModal(inv);
+                document.getElementById('invoice-modal').classList.remove('hidden');
+            }
+        }
+
+        function editInvoice(id) {
+            const inv = invoices.find(i => i.id === id);
+            if (!inv) return;
+
+            editingInvoiceId = inv.id;
+            document.getElementById('form-title').innerText = `Edit (${inv.invNumber})`;
+
+            document.getElementById('inv-number').value = inv.invNumber;
+            document.getElementById('inv-date').value = inv.date;
+            document.getElementById('inv-payment-method').value = inv.paymentMethod || 'Cash';
+            document.getElementById('cust-name').value = inv.customer.name;
+            document.getElementById('cust-phone').value = inv.customer.phone;
+            document.getElementById('cust-address').value = inv.customer.address || '';
+            document.getElementById('inv-discount').value = inv.discount || 0;
+            document.getElementById('inv-tax').value = inv.tax || 0;
+            document.getElementById('inv-paid').value = inv.paid || 0;
+            document.getElementById('inv-notes').value = inv.notes || settings.terms;
+
+            document.getElementById('items-tbody').innerHTML = '';
+            document.getElementById('items-mobile-container').innerHTML = '';
+
+            inv.items.forEach(item => {
+                addItemRow(item.cat, item.desc, item.qty, item.price, item.warranty);
+            });
+
+            switchTab('form');
+        }
+
+        function deleteInvoice(id) {
+            const inv = invoices.find(i => i.id === id);
+            if (!inv) return;
+
+            if (confirm(`Delete invoice ${inv.invNumber} for ${inv.customer.name}?`)) {
+                invoices = invoices.filter(i => i.id !== id);
+                saveToStorage();
+                renderHistory();
+                showToast(`Deleted ${inv.invNumber}`, 'warning');
+            }
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('stat-count').innerText = invoices.length;
+            const totalRev = invoices.reduce((sum, i) => sum + i.total, 0);
+            document.getElementById('stat-revenue').innerText = `${totalRev.toLocaleString()} ${settings.currency}`;
+            const totalItems = invoices.reduce((sum, inv) => sum + inv.items.reduce((s, i) => s + i.qty, 0), 0);
+            document.getElementById('stat-items').innerText = totalItems;
+            document.getElementById('stat-next-num').innerText = getNextInvoiceNumber();
+        }
+
+        function saveSettings() {
+            settings.storeName = document.getElementById('setting-store-name').value.trim() || 'SAPPHIRE';
+            settings.tagline = document.getElementById('setting-tagline').value.trim();
+            settings.phone = document.getElementById('setting-phone').value.trim() || '09774789988';
+            settings.address = document.getElementById('setting-address').value.trim();
+            settings.currency = document.getElementById('setting-currency').value.trim() || 'Ks';
+            settings.terms = document.getElementById('setting-terms').value.trim();
+
+            saveToStorage();
+            showToast('Settings saved', 'success');
+        }
+
+        function clearAllData() {
+            if (confirm('Permanently delete all invoice history and reset numbers?')) {
+                localStorage.removeItem(STORAGE_INVOICES_KEY);
+                localStorage.removeItem(STORAGE_COUNTER_KEY);
+                invoices = [];
+                counter = 1;
+                saveToStorage();
+                renderHistory();
+                showToast('Data reset complete', 'warning');
+            }
+        }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const text = document.getElementById('toast-msg');
+
+            text.innerText = msg;
+            if (type === 'error') {
+                icon.className = 'fa-solid fa-circle-xmark text-rose-400 text-base';
+            } else if (type === 'warning') {
+                icon.className = 'fa-solid fa-triangle-exclamation text-amber-400 text-base';
+            } else {
+                icon.className = 'fa-solid fa-circle-check text-emerald-400 text-base';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 2500);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
